@@ -1,0 +1,15 @@
+agents
+io
+json
+langchain==0.3.22
+langchain_core
+langchain_groq
+numpy==1.26.4
+os
+pandas==2.2.3
+pkg_resources
+plotly==6.0.1
+re
+sqlite3
+streamlit==1.44.1
+typing
