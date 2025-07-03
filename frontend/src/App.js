@@ -111,11 +111,16 @@ const AccentTextField = styled(TextField)(({ theme }) => ({
 }));
 
 // Google Fonts
-const fontLink = document.createElement('link');
-fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
-fontLink.rel = 'stylesheet';
-document.head.appendChild(fontLink);
-document.body.style.fontFamily = 'Inter, Roboto, Arial, sans-serif';
+useEffect(() => {
+  const fontLink = document.createElement('link');
+  fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
+  fontLink.rel = 'stylesheet';
+  document.head.appendChild(fontLink);
+  document.body.style.fontFamily = 'Inter, Roboto, Arial, sans-serif';
+  return () => {
+    document.head.removeChild(fontLink);
+  };
+}, []);
 
 // Animated SVG background
 const AnimatedBackground = styled('div')({
