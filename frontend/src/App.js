@@ -57,7 +57,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
 import MenuIcon from '@mui/icons-material/Menu';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';http://localhost:8000';
+const API_URL = 'http://localhost:8000';
 
 // Custom styled components for enhanced look
 const GradientCard = styled(Card)(({ theme }) => ({
@@ -109,18 +109,6 @@ const AccentTextField = styled(TextField)(({ theme }) => ({
     color: '#b2dfdb',
   },
 }));
-
-// Google Fonts
-useEffect(() => {
-  const fontLink = document.createElement('link');
-  fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
-  fontLink.rel = 'stylesheet';
-  document.head.appendChild(fontLink);
-  document.body.style.fontFamily = 'Inter, Roboto, Arial, sans-serif';
-  return () => {
-    document.head.removeChild(fontLink);
-  };
-}, []);
 
 // Animated SVG background
 const AnimatedBackground = styled('div')({
@@ -233,6 +221,18 @@ function App() {
       fontFamily: 'Inter, Roboto, Arial, sans-serif',
     },
   });
+
+  // Font loading useEffect
+  useEffect(() => {
+    const fontLink = document.createElement('link');
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
+    fontLink.rel = 'stylesheet';
+    document.head.appendChild(fontLink);
+    document.body.style.fontFamily = 'Inter, Roboto, Arial, sans-serif';
+    return () => {
+      document.head.removeChild(fontLink);
+    };
+  }, []);
 
   // Show snackbar on successful file upload or visualization
   useEffect(() => {
