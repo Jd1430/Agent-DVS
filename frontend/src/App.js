@@ -56,8 +56,9 @@ import DialogActions from '@mui/material/DialogActions';
 import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
 import MenuIcon from '@mui/icons-material/Menu';
+import ReactMarkdown from 'react-markdown';
 
-const API_URL = 'https://agent-dvs.onrender.com';
+const API_URL = 'http://localhost:8000';
 
 // Custom styled components for enhanced look
 const GradientCard = styled(Card)(({ theme }) => ({
@@ -210,15 +211,66 @@ function App() {
   const muiTheme = createTheme({
     palette: {
       mode: themeMode,
-      primary: { main: '#4CAF50' },
-      secondary: { main: '#00bcd4' },
+      primary: { main: themeMode === 'dark' ? '#43e97b' : '#388E3C' }, // Vibrant green (dark), deep green (light)
+      secondary: { main: themeMode === 'dark' ? '#38f9d7' : '#1976D2' }, // Vibrant teal (dark), deep blue (light)
       background: {
-        default: themeMode === 'dark' ? '#18192a' : '#f8feff',
-        paper: themeMode === 'dark' ? '#23243a' : '#fff',
+        default: themeMode === 'dark' ? '#181A20' : '#F8FAFC', // Deep blue/charcoal (dark), soft light gray (light)
+        paper: themeMode === 'dark' ? '#23243a' : '#FFFFFF', // Slightly lighter for cards
       },
+      text: {
+        primary: themeMode === 'dark' ? '#F5F5F7' : '#23243A', // High contrast
+        secondary: themeMode === 'dark' ? '#B0B3B8' : '#6B7280', // Muted
+      },
+      divider: themeMode === 'dark' ? 'rgba(67,233,123,0.18)' : '#E0E0E0',
     },
     typography: {
       fontFamily: 'Inter, Roboto, Arial, sans-serif',
+      h6: {
+        fontWeight: 700,
+        letterSpacing: 0.5,
+      },
+      body1: {
+        fontSize: 16,
+      },
+      body2: {
+        fontSize: 15,
+      },
+    },
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            borderBottom: themeMode === 'dark' ? '1px solid #38f9d7' : '1px solid #E0E0E0',
+          },
+          head: {
+            fontWeight: 700,
+            color: themeMode === 'dark' ? '#43e97b' : '#388E3C',
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            fontWeight: 600,
+            textTransform: 'none',
+          },
+        },
+      },
     },
   });
 
@@ -649,7 +701,7 @@ function App() {
                           <Typography variant="h6">🗂️ File Overview</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <Typography variant="body1">{fileOverview}</Typography>
+                          <ReactMarkdown components={{ code: ({node, inline, className, children, ...props}) => <span>{children}</span> }} children={fileOverview} />
                         </AccordionDetails>
                       </GradientAccordion>
                       <GradientAccordion defaultExpanded>
@@ -690,7 +742,7 @@ function App() {
                         <AccordionDetails>
                           <GradientCard sx={{ border: '2px solid #00bcd4', borderRadius: 2, background: 'linear-gradient(135deg, #eef1f5, #f8feff)', color: 'black', p: 2 }}>
                             <CardContent>
-                              <Typography variant="body1" sx={{ color: '#23243a' }}>{summary}</Typography>
+                              <ReactMarkdown components={{ code: ({node, inline, className, children, ...props}) => <span>{children}</span> }} children={summary} />
                             </CardContent>
                           </GradientCard>
                         </AccordionDetails>
@@ -740,62 +792,68 @@ function App() {
                                 </Table>
                               </TableContainer>
                             ) : (
-                              typeof queryResult.result === 'string' && queryResult.result.split('\n').length > 2 && queryResult.result.includes('  ')
-                                ? (() => {
-                                    // Try to parse DataFrame-like string
-                                    const lines = queryResult.result.split('\n').filter(l => l.trim() && !l.trim().startsWith('...'));
-                                    if (lines.length < 2) return (
-                                      <GradientPaper sx={{ p: 2, minHeight: 80 }}>
-                                        <pre style={{ margin: 0, color: '#00e676', fontWeight: 600 }}>{queryResult.result}</pre>
-                                      </GradientPaper>
-                                    );
-                                    const header = lines[0].split(/\s{2,}/).map(h => h.trim());
-                                    const rows = lines.slice(1).map(line => line.split(/\s{2,}/));
-                                    return (
-                                      <TableContainer component={GradientPaper} sx={{
-                                        maxHeight: 300,
-                                        ...customScrollbar,
-                                        border: '2px solid #00bcd4',
-                                        borderRadius: 2,
-                                        boxShadow: '0 2px 8px 0 rgba(0,188,212,0.18)',
-                                        background: 'linear-gradient(135deg, #23243a 60%, #2a033d 100%)',
-                                        mt: 1
-                                      }}>
-                                        <Table size="small" stickyHeader>
-                                          <TableHead>
-                                            <TableRow>
-                                              {header.map((col, i) => (
-                                                <Tooltip key={col + i} title={col} arrow placement="top">
-                                                  <TableCell align="center" sx={{ color: '#4CAF50', fontWeight: 700, background: '#23243a', borderBottom: '2px solid #00bcd4', fontSize: 15 }}>{col}</TableCell>
-                                                </Tooltip>
-                                              ))}
-                                            </TableRow>
-                                          </TableHead>
-                                          <TableBody>
-                                            {rows.map((row, idx) => (
-                                              <TableRow key={idx} sx={{ background: idx % 2 === 0 ? '#23243a' : '#2a033d', '&:hover': { background: '#00bcd4', color: '#23243a' } }}>
-                                                {row.map((cell, j) => (
-                                                  <TableCell key={j} align="center" sx={{ color: '#fff', borderBottom: '1px solid #4CAF50', fontSize: 14 }}>{cell}</TableCell>
-                                                ))}
-                                              </TableRow>
+                              typeof queryResult.result === 'string' && (() => {
+                                const lines = queryResult.result.split('\n').filter(l => l.trim() && !l.trim().startsWith('...'));
+                                if (lines.length < 2) {
+                                  // Not enough lines for a table, show as plain text
+                                  return (
+                                    <GradientPaper sx={{ p: 2, minHeight: 80 }}>
+                                      <pre style={{ margin: 0, color: '#00e676', fontWeight: 600 }}>{queryResult.result}</pre>
+                                    </GradientPaper>
+                                  );
+                                }
+                                // Try to parse header and rows
+                                const header = lines[0].split(/\s{2,}/).map(h => h.trim());
+                                const rows = lines.slice(1).map(line => line.split(/\s{2,}/));
+                                // If header/row lengths don't match, fallback to plain text
+                                if (!rows.every(row => row.length === header.length)) {
+                                  return (
+                                    <GradientPaper sx={{ p: 2, minHeight: 80 }}>
+                                      <pre style={{ margin: 0, color: '#00e676', fontWeight: 600 }}>{queryResult.result}</pre>
+                                    </GradientPaper>
+                                  );
+                                }
+                                // Render as table
+                                return (
+                                  <TableContainer component={GradientPaper} sx={{
+                                    maxHeight: 300,
+                                    ...customScrollbar,
+                                    border: '2px solid #00bcd4',
+                                    borderRadius: 2,
+                                    boxShadow: '0 2px 8px 0 rgba(0,188,212,0.18)',
+                                    background: 'linear-gradient(135deg, #23243a 60%, #2a033d 100%)',
+                                    mt: 1
+                                  }}>
+                                    <Table size="small" stickyHeader>
+                                      <TableHead>
+                                        <TableRow>
+                                          {header.map((col, i) => (
+                                            <Tooltip key={col + i} title={col} arrow placement="top">
+                                              <TableCell align="center" sx={{ color: '#4CAF50', fontWeight: 700, background: '#23243a', borderBottom: '2px solid #00bcd4', fontSize: 15 }}>{col}</TableCell>
+                                            </Tooltip>
+                                          ))}
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {rows.map((row, idx) => (
+                                          <TableRow key={idx} sx={{ background: idx % 2 === 0 ? '#23243a' : '#2a033d', '&:hover': { background: '#00bcd4', color: '#23243a' } }}>
+                                            {row.map((cell, j) => (
+                                              <TableCell key={j} align="center" sx={{ color: '#fff', borderBottom: '1px solid #4CAF50', fontSize: 14 }}>{cell}</TableCell>
                                             ))}
-                                          </TableBody>
-                                        </Table>
-                                      </TableContainer>
-                                    );
-                                  })()
-                                : (
-                                  <GradientPaper sx={{ p: 2, minHeight: 80 }}>
-                                    <pre style={{ margin: 0, color: '#00e676', fontWeight: 600 }}>{queryResult.result}</pre>
-                                  </GradientPaper>
-                                )
+                                          </TableRow>
+                                        ))}
+                                      </TableBody>
+                                    </Table>
+                                  </TableContainer>
+                                );
+                              })()
                             )}
                           </Grid>
                           <Grid item xs={12} md={6}>
                             <Typography variant="h6">📖 Explanation</Typography>
                             <GradientCard sx={{ border: '2px solid #00bcd4', borderRadius: 2, background: 'linear-gradient(135deg, #eef1f5, #f8feff)', color: 'black', p: 2 }}>
                               <CardContent>
-                                <Typography variant="body2" sx={{ color: '#23243a' }}>{queryResult.justification}</Typography>
+                                <ReactMarkdown components={{ code: ({node, inline, className, children, ...props}) => <span>{children}</span> }} children={queryResult.justification} />
                               </CardContent>
                             </GradientCard>
                           </Grid>
@@ -836,7 +894,7 @@ function App() {
                       </AccordionSummary>
                       <AccordionDetails>
                         <Typography variant="body1" color="#00e676">{validation.validation_message}</Typography>
-                        <Typography variant="body2" color="#fff">{validation.justification}</Typography>
+                        <ReactMarkdown components={{ code: ({node, inline, className, children, ...props}) => <span>{children}</span> }} children={validation.justification} />
                       </AccordionDetails>
                     </GradientAccordion>
                   )}
