@@ -58,7 +58,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import MenuIcon from '@mui/icons-material/Menu';
 import ReactMarkdown from 'react-markdown';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://agent-dvs.onrender.com/'; //http://localhost:8000
 
 // Custom styled components for enhanced look
 const GradientCard = styled(Card)(({ theme }) => ({
